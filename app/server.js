@@ -54,6 +54,7 @@ http.createServer((req, res) => {
 <script>
 const networkData = ${JSON.stringify(networkData)};
 const pax=networkData.passengers;
+const legControl=document.createElement('label');legControl.innerHTML='Disrupted legs<select id="legs" multiple size="3"><option value="SFO-JFK" selected>SFO–JFK</option><option value="JFK-LHR" selected>JFK–LHR</option><option value="LHR-DEL">LHR–DEL</option><option value="SIN-HKG">SIN–HKG</option><option value="SYD-AKL">SYD–AKL</option></select>';document.querySelector('.controls').appendChild(legControl);
 function renderQueue(severity,news){const rank={Critical:4,High:3,Medium:2,Low:1};const ordered=[...pax].sort((a,b)=>(rank[b[3]]-rank[a[3]])+(Math.random()-.5)*news*2);document.querySelector('#passengers').innerHTML=ordered.map((p,i)=>{const cancelled=(severity+news*.4>.92&&i>4)||(news>.7&&i>5);const action=cancelled?'Cancellation recovery · reaccommodate':(severity>.75?'Tight connection · protect':'Monitor · confirmed');return '<article class="passenger"><span class="priority">'+p[3]+' priority · '+(p[4]||'None')+' loyalty</span><b>'+p[0]+'</b><div>'+p[1]+'</div><div>'+p[2]+' · '+action+'</div></article>'}).join('')}
 renderQueue(+document.querySelector('#weather').value,+document.querySelector('#news').value);
 const hubCoords={JFK:[40.64,-73.78],ORD:[41.98,-87.90],DFW:[32.90,-97.04],LHR:[51.47,-.45],DXB:[25.25,55.36],DOH:[25.27,51.61],DEL:[28.56,77.10],SIN:[1.36,103.99],HKG:[22.31,113.91],NRT:[35.77,140.39],ICN:[37.46,126.44],SYD:[-33.94,151.18],MEL:[-37.67,144.84],AKL:[-37.01,174.79]};
