@@ -8,11 +8,11 @@ It meets the Git/GitHub, Jenkins builder, Terraform deployer, and Docker runtime
 
 ## Application scenario
 
-SkyBridge is a **stochastic, non-linear decision-support simulation** for a weather-constrained airline hub. It samples uncertain storm duration, hub capacity, turbulence exposure, recovery-seat availability, and future demand; it then compares hold, cancellation, same-day rebooking, hotel, and hybrid recovery policies using a risk-adjusted network-cost score.
+SkyBridge is a **stochastic, non-linear decision-support simulation** for an airline network. It samples uncertain weather, airport-pair slot feasibility, curfew pressure, recovery-seat availability, geopolitical reroute exposure, and future demand; it then compares hold, cancellation, same-day rebooking, hotel, and hybrid recovery policies using a risk-adjusted network-cost score.
 
 The application uses a two-speed, seven-day recovery horizon: the first 72 hours are the active recovery window for holds, cancellations, hotels, rebooking, and recovery inventory; days 4–7 provide a capped new-sale fare and inventory forecast. Disruption-affected passengers receive fare protection; new sales are capped rather than surge-priced. Critical multi-leg passengers are protected, volunteers are sought before any involuntary action, and only flexible low-priority itineraries are considered for safe reaccommodation. All passenger, inventory, and cost values are simulated for classroom use.
 
-The hub selector includes North American, European, Asian, Middle Eastern, Australian, and New Zealand hubs, including DXB, DOH, DEL, SIN, HKG, NRT, ICN, SYD, MEL, and AKL. The browser requests current conditions from the no-key [Open-Meteo forecast API](https://open-meteo.com/en/docs) and converts wind gusts, precipitation, and severe-weather codes into the forecast-severity input. If the API is unavailable, the simulator continues using its fallback severity value.
+The hub selector includes North American, European, Asian, Middle Eastern, Australian, and New Zealand hubs, including DXB, DOH, DEL, SIN, HKG, NRT, ICN, SYD, MEL, and AKL. The browser automatically gathers current conditions from the no-key [Open-Meteo forecast API](https://open-meteo.com/en/docs), aviation-disruption news signals from GDELT, and public volcanic-ash advisory signals. It combines wind, gusts, visibility, low/mid/total cloud, precipitation, rain, showers, snowfall, pressure, and weather codes into a weather risk score. When no material signal is present, the dashboard says so instead of fabricating a disruption.
 
 Synthetic input data is committed in `data/passengers.json`, `data/flights.json`, and `data/network.json`. The app loads these records at startup, so the passenger itineraries, flight seats/statuses, hub topology, disruption assumptions, and recovery costs are inspectable and reproducible. No real passenger information is used.
 
@@ -112,7 +112,7 @@ Capture real screenshots after your own successful run:
 1. Jenkins job page showing at least one successful build (and preferably the build history after a commit-triggered build).
 2. The Console Output for that build, showing `docker build` and `terraform apply` completed successfully.
 3. Docker Desktop Containers view or `docker ps` showing both `local-pipeline-jenkins` and `local-pipeline-app` running.
-4. Browser at `http://localhost:8081` showing the SkyBridge optimizer recommendation and its build number.
+4. Browser at `http://localhost:8081` showing the SkyBridge optimizer recommendation, automatic forecast/airspace monitor, computed scenario metrics, and its build number.
 5. Optional but useful: Jenkins job configuration showing **Pipeline script from SCM** and/or the GitHub commit history showing the triggering commit.
 
 Do not use sample or fabricated screenshots.

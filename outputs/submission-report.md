@@ -16,19 +16,19 @@ This project was completed by:
 - [ ] **Automated CI Trigger:** Jenkins SCM polling was configured as `H/2 * * * *`. Check this only after a real commit is pushed and Jenkins starts a new build automatically.
 - [x] **Jenkins (Builder):** Jenkins checks out the repository, builds a Docker image tagged with the Jenkins build number, and runs `terraform apply`.
 - [x] **Terraform (Deployer):** Terraform uses the `kreuzwerker/docker` provider and the local Docker socket to create or replace the deployed application container.
-- [x] **Docker (Runtime):** Docker Desktop hosts the Jenkins container and the deployed Weather Dashboard container.
+- [x] **Docker (Runtime):** Docker Desktop hosts the Jenkins container and the deployed SkyBridge application container.
 
 ## Local setup
 
 This project runs locally on macOS using Docker Desktop. The deployed application is SkyBridge Network Recovery Optimizer, a stochastic classroom simulation that evaluates airline-wide recovery actions for a weather-constrained hub. Jenkins runs in a Docker container named `local-pipeline-jenkins`, started with Docker Compose. The Docker Compose configuration mounts the Docker Desktop socket (`/var/run/docker.sock`) into the Jenkins container. This allows the Docker CLI and Terraform Docker provider inside Jenkins to communicate with the Docker Desktop daemon.
 
-The application uses randomized Monte Carlo trials and a non-linear, risk-adjusted cost score rather than a deterministic fare calculator. It compares flight holds, cancellation/rebooking, hotel protection, and hybrid recovery actions. It also applies regulated recovery-inventory rules: priority multi-leg passengers are protected, volunteers are sought before involuntary action, and flexible low-priority guests are considered for safe reaccommodation. Its seven-day horizon emphasizes the first 72 hours for active recovery decisions and uses days 4–7 for capped new-sale pricing and inventory forecasting, while protecting disrupted passengers from price increases.
+The application uses randomized Monte Carlo trials and a non-linear, risk-adjusted cost score rather than a deterministic fare calculator. It compares flight holds, cancellation/rebooking, hotel protection, and hybrid recovery actions. It also applies regulated recovery-inventory rules: priority multi-leg passengers are protected, volunteers are sought before involuntary action, and flexible low-priority guests are considered for safe reaccommodation. The overbooking/recovery recommendation varies with predicted disruption severity and geopolitical reroute exposure. Its seven-day horizon emphasizes the first 72 hours for active recovery decisions; days 4–7 use an automatically predicted last-minute demand forecast to produce bounded new-sale fares, while disrupted passengers retain fare protection.
 
-The hub selector covers North American, European, Asian, Middle Eastern, Australian, and New Zealand hubs. The dashboard requests current weather conditions from Open-Meteo when available and uses wind gusts, precipitation, and severe-weather codes as a transparent weather-severity input; simulated values remain available as a fallback.
+The hub selector covers North American, European, Asian, Middle Eastern, Australian, and New Zealand hubs. The dashboard automatically uses Open-Meteo weather signals, GDELT aviation-disruption news signals, and public volcanic-ash advisory signals. Its weather score considers wind speed and gusts, visibility, cloud layers, precipitation/rain/showers/snowfall, pressure, and weather codes. The dashboard visibly reports the automatic forecast and airspace monitor; if an external source is unavailable, it reports the unavailable/low-signal state rather than fabricating an alert.
 
 The scenario inputs are synthetic and version-controlled in `data/passengers.json`, `data/flights.json`, and `data/network.json`. These files provide multi-leg passenger itineraries, flight schedules and remaining seats, hub topology, disruption assumptions, and recovery-cost parameters. No personally identifiable passenger data is used.
 
-This setup is Docker-outside-of-Docker: Jenkins does not run a second Docker daemon. Instead, it manages Docker Desktop directly. The Weather Dashboard is deployed as a sibling container named `local-pipeline-app`, not as a nested container inside Jenkins. The application is exposed at `http://localhost:8081`.
+This setup is Docker-outside-of-Docker: Jenkins does not run a second Docker daemon. Instead, it manages Docker Desktop directly. SkyBridge is deployed as a sibling container named `local-pipeline-app`, not as a nested container inside Jenkins. The application is exposed at `http://localhost:8081`.
 
 The Jenkins job is configured as a Pipeline job using **Pipeline script from SCM**. Jenkins reads the `Jenkinsfile` from the GitHub repository. For a public repository, no GitHub checkout credential is required. For a private repository, Jenkins uses a GitHub credential stored in Jenkins with read access to the repository.
 
@@ -56,9 +56,9 @@ The following evidence was captured from my own local environment. Insert the re
    `[Insert a Docker Desktop or terminal screenshot here.]`  
    The screenshot shows both `local-pipeline-jenkins` and `local-pipeline-app` running.
 
-4. **Running deployed application**  
+4. **Running deployed application and automatic forecast**  
    `[Insert a browser screenshot here.]`  
-   The screenshot shows the SkyBridge optimizer at `http://localhost:8081`, including its displayed Jenkins build number and recommended recovery policy.
+   The screenshot shows the SkyBridge optimizer at `http://localhost:8081`, including its displayed Jenkins build number, automatic weather/airspace/ash forecast, computed metrics, and recommended recovery policy.
 
 ## How I verified the pipeline
 
@@ -72,4 +72,4 @@ The following evidence was captured from my own local environment. Insert the re
 
 ## Notes
 
-No GitHub URL, personal name, or screenshots are pre-filled in this report. Those items must reflect the actual work completed and verified in the local environment.
+The student name field intentionally remains blank. Add your name before submitting. Insert only screenshots captured from this local environment.
