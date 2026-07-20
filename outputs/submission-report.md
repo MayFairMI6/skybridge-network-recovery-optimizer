@@ -13,7 +13,7 @@ This project was completed by:
 ## Completed requirements
 
 - [x] **Git/GitHub:** The GitHub repository contains the SkyBridge Network Recovery Optimizer application, `Dockerfile`, `Jenkinsfile`, Terraform configuration, Jenkins Docker setup, and documentation.
-- [ ] **Automated CI Trigger:** Jenkins SCM polling was configured as `H/2 * * * *`. Check this only after a real commit is pushed and Jenkins starts a new build automatically.
+- [x] **Automated CI Trigger:** Jenkins SCM polling is configured as `H/2 * * * *`. A GitHub push was detected by Jenkins and automatically started successful build #46 with the SCM-trigger cause; **Build Now** was not used.
 - [x] **Jenkins (Builder):** Jenkins checks out the repository, builds a Docker image tagged with the Jenkins build number, and runs `terraform apply`.
 - [x] **Terraform (Deployer):** Terraform uses the `kreuzwerker/docker` provider and the local Docker socket to create or replace the deployed application container.
 - [x] **Docker (Runtime):** Docker Desktop hosts the Jenkins container and the deployed SkyBridge application container.
@@ -38,7 +38,7 @@ When a build runs, Jenkins first checks out the configured Git branch. It then b
 
 Terraform uses the `kreuzwerker/docker` provider to deploy the image as the `local-pipeline-app` container. The deployed container listens internally on port 3000 and is published to port 8081 on the Mac. Each new Jenkins build passes a new image tag to Terraform, which updates the deployed container to use the new image.
 
-The `Jenkinsfile` also enables SCM polling with `H/2 * * * *`, so Jenkins checks the repository approximately every two minutes. When it detects a pushed commit, it starts a new build.
+The `Jenkinsfile` also enables SCM polling with `H/2 * * * *`, so Jenkins checks the repository approximately every two minutes. This was verified when a GitHub push automatically started successful Jenkins build #46 with the SCM-trigger cause.
 
 ## Verification evidence
 
@@ -68,7 +68,7 @@ The following evidence was captured from my own local environment on July 20, 20
 4. I clicked **Build Now** once to confirm the initial deployment. I confirmed the build succeeded in Jenkins.
 5. I verified the deployed containers by running `docker ps --filter name=local-pipeline-app` and by checking Docker Desktop.
 6. I opened `http://localhost:8081` in a browser and confirmed that the SkyBridge optimizer loaded and returned a recovery recommendation.
-7. The SCM polling schedule is configured as `H/2 * * * *`. To claim the optional automated-trigger checkbox, I will make a small visible change in `app/server.js`, commit and push it, wait at least two minutes, and capture the Jenkins build that starts without using **Build Now**. Until that last check is captured, the report correctly leaves the optional checkbox unchecked.
+7. I pushed the PDF-report workflow commit to GitHub and did not use **Build Now**. Jenkins detected the change through its `H/2 * * * *` poll, queued the job as an SCM change, and automatically ran successful build #46. I confirmed the Jenkins build record reports the SCM-trigger cause.
 
 ## Notes
 

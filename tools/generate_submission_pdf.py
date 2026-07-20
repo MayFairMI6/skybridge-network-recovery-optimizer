@@ -130,7 +130,7 @@ def build_pdf():
     story.extend([metadata, Spacer(1, 0.12 * inch), heading("Completed requirements", styles)])
     requirements = [
         ("Git/GitHub", "Complete. The repository contains the application, Dockerfile, Jenkinsfile, Terraform configuration, Jenkins Docker setup, and documentation."),
-        ("Automated CI Trigger", "Configured as SCM polling H/2 * * * *. The optional checkbox is left unchecked until a commit-triggered build is captured without using Build Now."),
+        ("Automated CI Trigger", "Complete. SCM polling H/2 * * * * detected a GitHub push and automatically started successful Jenkins build #46; Build Now was not used."),
         ("Jenkins (Builder)", "Complete. Jenkins checks out the repository, builds a Docker image, and runs terraform apply."),
         ("Terraform (Deployer)", "Complete. Terraform uses the kreuzwerker/docker provider and the local Docker socket to create or replace the application container."),
         ("Docker (Runtime)", "Complete. Docker Desktop hosts both Jenkins and the deployed SkyBridge application."),
