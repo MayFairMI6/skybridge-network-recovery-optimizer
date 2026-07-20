@@ -51,7 +51,7 @@ Complete the setup wizard and create an administrator account. To stop Jenkins l
 
 ### Docker socket note
 
-The compose file mounts `/var/run/docker.sock`. On a standard Docker Desktop for Mac installation it is usable by the Jenkins container. If a build reports `permission denied while trying to connect to the Docker daemon socket`, inspect it with `docker exec local-pipeline-jenkins ls -ln /var/run/docker.sock`. Configure the socket/group access for the Jenkins container according to your Docker Desktop installation, then restart the compose service. Do not expose the Jenkins port beyond your local machine: access to the Docker socket is effectively host-level Docker control.
+The compose file mounts `/var/run/docker.sock` and runs this local coursework controller as `root` inside the Jenkins container because Docker Desktop exposes the socket as root-owned in this setup. This is required for Jenkins to invoke the host daemon. Do not expose the Jenkins port beyond your local machine: access to the Docker socket is effectively host-level Docker control.
 
 ## Required Jenkins plugins and credentials
 

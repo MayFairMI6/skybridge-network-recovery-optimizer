@@ -3,6 +3,9 @@ services:
     build:
       context: ./jenkins
     container_name: local-pipeline-jenkins
+    # Docker Desktop's mounted socket is root-owned on this Mac. Running the
+    # local coursework controller as root lets Jenkins invoke the host daemon.
+    user: root
     restart: unless-stopped
     ports:
       - "8080:8080"
