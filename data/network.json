@@ -1,6 +1,6 @@
 {
   "primaryHub": "JFK",
-  "alternateHubs": ["ORD", "DFW", "LHR", "CDG", "DXB", "DOH", "SIN", "HKG", "NRT", "ICN"],
+  "alternateHubs": ["ORD", "DFW", "LHR", "CDG", "DXB", "DOH", "DEL", "SIN", "HKG", "NRT", "ICN", "SYD", "MEL", "AKL"],
   "disruption": {"type": "convective-weather-capacity-restriction", "capacityReduction": 0.45, "durationHours": [2, 6]},
   "costs": {"hotelPerPassenger": 235, "mealVoucher": 75, "voluntaryRebookingOffer": 560, "involuntaryReaccommodation": 1200}
 }

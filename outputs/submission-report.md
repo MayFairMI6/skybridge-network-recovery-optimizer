@@ -24,7 +24,7 @@ This project runs locally on macOS using Docker Desktop. The deployed applicatio
 
 The application uses randomized Monte Carlo trials and a non-linear, risk-adjusted cost score rather than a deterministic fare calculator. It compares flight holds, cancellation/rebooking, hotel protection, and hybrid recovery actions. It also applies regulated recovery-inventory rules: priority multi-leg passengers are protected, volunteers are sought before involuntary action, and flexible low-priority guests are considered for safe reaccommodation. Its seven-day horizon emphasizes the first 72 hours for active recovery decisions and uses days 4–7 for capped new-sale pricing and inventory forecasting, while protecting disrupted passengers from price increases.
 
-The hub selector covers North American, European, Asian, and Middle Eastern hubs. The dashboard requests current weather conditions from Open-Meteo when available and uses wind gusts, precipitation, and severe-weather codes as a transparent weather-severity input; simulated values remain available as a fallback.
+The hub selector covers North American, European, Asian, Middle Eastern, Australian, and New Zealand hubs. The dashboard requests current weather conditions from Open-Meteo when available and uses wind gusts, precipitation, and severe-weather codes as a transparent weather-severity input; simulated values remain available as a fallback.
 
 The scenario inputs are synthetic and version-controlled in `data/passengers.json`, `data/flights.json`, and `data/network.json`. These files provide multi-leg passenger itineraries, flight schedules and remaining seats, hub topology, disruption assumptions, and recovery-cost parameters. No personally identifiable passenger data is used.
 
