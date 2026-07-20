@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Build a polished PDF version of the local deployment submission report."""
+"""Render the markdown submission report as a PDF."""
 
 from pathlib import Path
+import html
+import re
 
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
@@ -12,24 +14,28 @@ from reportlab.platypus import (
     HRFlowable,
     Image,
     KeepTogether,
-    PageBreak,
     Paragraph,
     SimpleDocTemplate,
     Spacer,
-    Table,
-    TableStyle,
 )
 
 
 ROOT = Path(__file__).resolve().parents[1]
+SOURCE_MD = ROOT / "outputs" / "submission-report.md"
 OUTPUT = ROOT / "outputs" / "pdf" / "automated-deployment-pipeline-submission-report.pdf"
-SCREENSHOTS = ROOT / "outputs" / "screenshots"
 
 NAVY = colors.HexColor("#0B1F3A")
 BLUE = colors.HexColor("#1677C8")
-PALE_BLUE = colors.HexColor("#EAF4FC")
-GREEN = colors.HexColor("#138A5B")
 GRAY = colors.HexColor("#52606D")
+HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
+IMAGE_RE = re.compile(r"^!\[(.*?)\]\((.*?)\)\s*$")
+UL_RE = re.compile(r"^\s*[-*]\s+(.*)$")
+OL_RE = re.compile(r"^\s*(\d+)\.\s+(.*)$")
+HR_RE = re.compile(r"^\s*([-*_])\1{2,}\s*$")
+LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
+ITALIC_RE = re.compile(r"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)")
+CODE_RE = re.compile(r"`([^`]+)`")
 
 
 def footer(canvas, doc):
@@ -43,27 +49,132 @@ def footer(canvas, doc):
     canvas.restoreState()
 
 
-def heading(text, styles):
-    return Paragraph(text, styles["SectionHeading"])
+def inline_markdown(text):
+    text = text.rstrip().replace("  ", " ")
+    if text.startswith("[x] ") or text.startswith("[X] "):
+        text = f"☑ {text[4:]}"
+    elif text.startswith("[ ] "):
+        text = f"☐ {text[4:]}"
+    escaped = html.escape(text)
+    escaped = LINK_RE.sub(r"\1 (\2)", escaped)
+    escaped = BOLD_RE.sub(r"<b>\1</b>", escaped)
+    escaped = ITALIC_RE.sub(r"<i>\1</i>", escaped)
+    escaped = CODE_RE.sub(r"<font name='Courier'>\1</font>", escaped)
+    return escaped
 
 
-def body(text, styles):
-    return Paragraph(text, styles["Body"])
-
-
-def evidence_image(filename, caption, styles):
-    path = SCREENSHOTS / filename
-    image = Image(str(path))
-    max_width = 6.55 * inch
-    max_height = 7.1 * inch
+def image_flowable(md_path, image_ref, caption, styles):
+    candidate = (md_path.parent / image_ref).resolve()
+    if not candidate.exists():
+        candidate = (ROOT / image_ref).resolve()
+    if not candidate.exists():
+        return Paragraph(
+            f"<b>Missing image:</b> {html.escape(image_ref)}",
+            styles["Body"],
+        )
+    image = Image(str(candidate))
+    max_width = 6.45 * inch
+    max_height = 7.0 * inch
     ratio = min(max_width / image.imageWidth, max_height / image.imageHeight)
     image.drawWidth = image.imageWidth * ratio
     image.drawHeight = image.imageHeight * ratio
-    return KeepTogether([image, Spacer(1, 0.08 * inch), Paragraph(caption, styles["Caption"]), Spacer(1, 0.2 * inch)])
+    items = [image]
+    if caption.strip():
+        items.extend([Spacer(1, 0.08 * inch), Paragraph(inline_markdown(caption), styles["Caption"])])
+    return KeepTogether(items)
+
+
+def append_paragraph(lines, story, styles):
+    text = " ".join(line.strip() for line in lines if line.strip())
+    if text:
+        story.extend([Paragraph(inline_markdown(text), styles["Body"]), Spacer(1, 0.04 * inch)])
+
+
+def render_markdown(md_path, styles):
+    lines = md_path.read_text(encoding="utf-8").splitlines()
+    story = []
+    paragraph_lines = []
+    i = 0
+    while i < len(lines):
+        raw = lines[i]
+        stripped = raw.strip()
+
+        if not stripped:
+            append_paragraph(paragraph_lines, story, styles)
+            paragraph_lines = []
+            i += 1
+            continue
+
+        heading = HEADING_RE.match(stripped)
+        image = IMAGE_RE.match(stripped)
+        bullet = UL_RE.match(raw)
+        numbered = OL_RE.match(raw)
+
+        if heading or image or bullet or numbered or HR_RE.match(stripped):
+            append_paragraph(paragraph_lines, story, styles)
+            paragraph_lines = []
+
+        if heading:
+            level = len(heading.group(1))
+            text = inline_markdown(heading.group(2))
+            if level == 1:
+                style = styles["Heading1"]
+            elif level == 2:
+                style = styles["Heading2"]
+            else:
+                style = styles["Heading3"]
+            story.extend([Paragraph(text, style), Spacer(1, 0.05 * inch)])
+            i += 1
+            continue
+
+        if image:
+            caption = image.group(1)
+            story.extend([image_flowable(md_path, image.group(2), caption, styles), Spacer(1, 0.12 * inch)])
+            i += 1
+            continue
+
+        if HR_RE.match(stripped):
+            story.extend([HRFlowable(width="100%", thickness=0.8, color=BLUE), Spacer(1, 0.08 * inch)])
+            i += 1
+            continue
+
+        if bullet:
+            items = []
+            while i < len(lines):
+                next_match = UL_RE.match(lines[i])
+                if not next_match:
+                    break
+                items.append(f"• {inline_markdown(next_match.group(1))}")
+                i += 1
+            for item in items:
+                story.append(Paragraph(item, styles["Bullet"]))
+            story.append(Spacer(1, 0.05 * inch))
+            continue
+
+        if numbered:
+            items = []
+            while i < len(lines):
+                next_match = OL_RE.match(lines[i])
+                if not next_match:
+                    break
+                items.append(f"{next_match.group(1)}. {inline_markdown(next_match.group(2))}")
+                i += 1
+            for item in items:
+                story.append(Paragraph(item, styles["Bullet"]))
+            story.append(Spacer(1, 0.05 * inch))
+            continue
+
+        paragraph_lines.append(raw)
+        i += 1
+
+    append_paragraph(paragraph_lines, story, styles)
+    return story
 
 
 def build_pdf():
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    if not SOURCE_MD.exists():
+        raise FileNotFoundError(f"Markdown source not found: {SOURCE_MD}")
     doc = SimpleDocTemplate(
         str(OUTPUT),
         pagesize=letter,
@@ -71,105 +182,80 @@ def build_pdf():
         leftMargin=0.65 * inch,
         topMargin=0.65 * inch,
         bottomMargin=0.8 * inch,
-        title="Automated Deployment Pipeline - Submission Report",
+        title="Automated Deployment Pipeline Submission Report",
         author="",
     )
     styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle(
-        name="ReportTitle", parent=styles["Title"], fontName="Helvetica-Bold",
-        fontSize=23, leading=27, textColor=NAVY, alignment=TA_CENTER, spaceAfter=7,
-    ))
-    styles.add(ParagraphStyle(
-        name="Subtitle", parent=styles["Normal"], fontName="Helvetica",
-        fontSize=10.5, leading=14, textColor=GRAY, alignment=TA_CENTER, spaceAfter=14,
-    ))
-    styles.add(ParagraphStyle(
-        name="SectionHeading", parent=styles["Heading2"], fontName="Helvetica-Bold",
-        fontSize=14, leading=17, textColor=NAVY, spaceBefore=12, spaceAfter=7,
-    ))
-    styles.add(ParagraphStyle(
-        name="Body", parent=styles["BodyText"], fontName="Helvetica",
-        fontSize=9.4, leading=13, spaceAfter=7, textColor=colors.HexColor("#263238"),
-    ))
-    styles.add(ParagraphStyle(
-        name="Caption", parent=styles["Normal"], fontName="Helvetica-Oblique",
-        fontSize=8.5, leading=11, textColor=GRAY, alignment=TA_CENTER,
-    ))
-    styles.add(ParagraphStyle(
-        name="Small", parent=styles["Normal"], fontName="Helvetica", fontSize=8.5,
-        leading=11, textColor=colors.HexColor("#263238"),
-    ))
-
-    story = [
-        Spacer(1, 0.18 * inch),
-        Paragraph("Automated Deployment Pipeline", styles["ReportTitle"]),
-        Paragraph("SkyBridge Network Recovery Optimizer", styles["Subtitle"]),
-        HRFlowable(width="100%", thickness=1.2, color=BLUE, spaceAfter=13),
-    ]
-
-    metadata = Table([
-        ["Student name(s)", ""],
-        ["Course / section", "[Enter course and section]"],
-        ["Submission date", "[Enter date]"],
-        ["GitHub repository", "https://github.com/MayFairMI6/skybridge-network-recovery-optimizer"],
-    ], colWidths=[1.65 * inch, 4.85 * inch])
-    metadata.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (0, -1), PALE_BLUE),
-        ("TEXTCOLOR", (0, 0), (0, -1), NAVY),
-        ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
-        ("FONTNAME", (1, 0), (1, -1), "Helvetica"),
-        ("FONTSIZE", (0, 0), (-1, -1), 9),
-        ("LEADING", (0, 0), (-1, -1), 12),
-        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#C7D3DE")),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 7),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-    ]))
-    story.extend([metadata, Spacer(1, 0.12 * inch), heading("Completed requirements", styles)])
-    requirements = [
-        ("Git/GitHub", "Complete. The repository contains the application, Dockerfile, Jenkinsfile, Terraform configuration, Jenkins Docker setup, and documentation."),
-        ("Automated CI Trigger", "Complete. SCM polling H/2 * * * * detected a GitHub push and automatically started successful Jenkins build #46; Build Now was not used."),
-        ("Jenkins (Builder)", "Complete. Jenkins checks out the repository, builds a Docker image, and runs terraform apply."),
-        ("Terraform (Deployer)", "Complete. Terraform uses the kreuzwerker/docker provider and the local Docker socket to create or replace the application container."),
-        ("Docker (Runtime)", "Complete. Docker Desktop hosts both Jenkins and the deployed SkyBridge application."),
-    ]
-    rows = [[Paragraph("Requirement", styles["Small"]), Paragraph("Verification", styles["Small"])]]
-    for label, description in requirements:
-        rows.append([Paragraph(f"<b>{label}</b>", styles["Small"]), Paragraph(description, styles["Small"])])
-    matrix = Table(rows, colWidths=[1.75 * inch, 4.75 * inch], repeatRows=1)
-    matrix.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), NAVY),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("BACKGROUND", (0, 1), (-1, -1), colors.white),
-        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#C7D3DE")),
-        ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 7),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-    ]))
-    story.extend([matrix, heading("Local setup and verification", styles)])
-    story.extend([
-        body("The project runs locally on macOS using Docker Desktop. Jenkins runs as the local-pipeline-jenkins Docker container and is configured in a Docker-outside-of-Docker pattern: the Docker Desktop socket is mounted into Jenkins so the Jenkins Docker CLI and Terraform Docker provider can manage the host daemon.", styles),
-        body("The deployed SkyBridge dashboard is a stochastic airline disruption-recovery simulation. It evaluates flight holds, cancellation/rebooking, hotel protection, recovery inventory, passenger priority, airport-pair slot pressure, weather, airspace, and volcanic-ash signals. It is a classroom prototype using synthetic network and passenger data, not a production airline system.", styles),
-        body("Verification sequence: start Docker Desktop; run Docker Compose from the repository root; open Jenkins at http://localhost:8080; run the Pipeline job; confirm a successful console log; verify local-pipeline-app is deployed to port 8081; then open http://localhost:8081 and capture the running dashboard.", styles),
-        heading("Captured verification evidence", styles),
-        body("The following pages contain unedited screenshots captured from the local environment. They show successful Jenkins builds, Terraform deployment, Docker runtime evidence, and the deployed application.", styles),
-        PageBreak(),
-        heading("1. Jenkins build history", styles),
-        evidence_image("jenkins-build-history.png", "Successful Jenkins build history for the SkyBridge Pipeline job.", styles),
-        PageBreak(),
-        heading("2. Jenkins console output", styles),
-        evidence_image("jenkins-console-success.png", "Terraform created local-pipeline-app:43, published port 8081, and the pipeline finished successfully.", styles),
-        PageBreak(),
-        heading("3. Docker runtime", styles),
-        evidence_image("docker-runtime.png", "Docker Compose starts local-pipeline-jenkins; docker ps confirms Jenkins is running on ports 8080 and 50000.", styles),
-        PageBreak(),
-        heading("4. Running deployed application", styles),
-        evidence_image("skybridge-dashboard.png", "SkyBridge Network Recovery Optimizer running locally at http://localhost:8081.", styles),
-    ])
+    styles.add(
+        ParagraphStyle(
+            name="Heading1",
+            parent=styles["Heading1"],
+            fontName="Helvetica-Bold",
+            fontSize=20,
+            leading=24,
+            textColor=NAVY,
+            alignment=TA_CENTER,
+            spaceBefore=8,
+            spaceAfter=9,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="Heading2",
+            parent=styles["Heading2"],
+            fontName="Helvetica-Bold",
+            fontSize=14,
+            leading=17,
+            textColor=NAVY,
+            spaceBefore=8,
+            spaceAfter=4,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="Heading3",
+            parent=styles["Heading3"],
+            fontName="Helvetica-Bold",
+            fontSize=11.5,
+            leading=14,
+            textColor=colors.HexColor("#102A43"),
+            spaceBefore=5,
+            spaceAfter=3,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="Body",
+            parent=styles["BodyText"],
+            fontName="Helvetica",
+            fontSize=9.5,
+            leading=13.2,
+            textColor=colors.HexColor("#243B53"),
+            alignment=TA_JUSTIFY,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="Bullet",
+            parent=styles["Body"],
+            leftIndent=14,
+            firstLineIndent=-10,
+            spaceBefore=1,
+            spaceAfter=1,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="Caption",
+            parent=styles["BodyText"],
+            fontName="Helvetica-Oblique",
+            fontSize=8.5,
+            leading=10.5,
+            textColor=GRAY,
+            alignment=TA_CENTER,
+        )
+    )
+    story = [Spacer(1, 0.08 * inch)] + render_markdown(SOURCE_MD, styles)
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
     print(OUTPUT)
 
