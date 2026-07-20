@@ -68,7 +68,7 @@ The following evidence was captured from my own local environment on July 20, 20
 4. I clicked **Build Now** once to confirm the initial deployment. I confirmed the build succeeded in Jenkins.
 5. I verified the deployed containers by running `docker ps --filter name=local-pipeline-app` and by checking Docker Desktop.
 6. I opened `http://localhost:8081` in a browser and confirmed that the SkyBridge optimizer loaded and returned a recovery recommendation.
-7. To verify automated polling, I made a small visible change in `app/server.js`, committed and pushed the change to GitHub, then waited at least two minutes. Jenkins detected the change and ran another build. I refreshed the optimizer and confirmed that its displayed build number changed.
+7. The SCM polling schedule is configured as `H/2 * * * *`. To claim the optional automated-trigger checkbox, I will make a small visible change in `app/server.js`, commit and push it, wait at least two minutes, and capture the Jenkins build that starts without using **Build Now**. Until that last check is captured, the report correctly leaves the optional checkbox unchecked.
 
 ## Notes
 
