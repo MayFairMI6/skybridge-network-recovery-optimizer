@@ -12,6 +12,8 @@ SkyBridge is a **stochastic, non-linear decision-support simulation** for a weat
 
 The application uses a two-speed, seven-day recovery horizon: the first 72 hours are the active recovery window for holds, cancellations, hotels, rebooking, and recovery inventory; days 4–7 provide a capped new-sale fare and inventory forecast. Disruption-affected passengers receive fare protection; new sales are capped rather than surge-priced. Critical multi-leg passengers are protected, volunteers are sought before any involuntary action, and only flexible low-priority itineraries are considered for safe reaccommodation. All passenger, inventory, and cost values are simulated for classroom use.
 
+The hub selector includes North American, European, Asian, and Middle Eastern hubs, including DXB, DOH, DEL, SIN, HKG, NRT, and ICN. The browser requests current conditions from the no-key [Open-Meteo forecast API](https://open-meteo.com/en/docs) and converts wind gusts, precipitation, and severe-weather codes into the forecast-severity input. If the API is unavailable, the simulator continues using its fallback severity value.
+
 ## Architecture
 
 Jenkins runs in a Docker container. Its `/var/run/docker.sock` is mounted from the Docker Desktop host, so the Docker CLI and Terraform Docker provider inside Jenkins manage the **host Docker daemon**. This pattern is commonly called Docker-outside-of-Docker. The application container is therefore a sibling of Jenkins, not nested inside it.

@@ -24,6 +24,8 @@ This project runs locally on macOS using Docker Desktop. The deployed applicatio
 
 The application uses randomized Monte Carlo trials and a non-linear, risk-adjusted cost score rather than a deterministic fare calculator. It compares flight holds, cancellation/rebooking, hotel protection, and hybrid recovery actions. It also applies regulated recovery-inventory rules: priority multi-leg passengers are protected, volunteers are sought before involuntary action, and flexible low-priority guests are considered for safe reaccommodation. Its seven-day horizon emphasizes the first 72 hours for active recovery decisions and uses days 4–7 for capped new-sale pricing and inventory forecasting, while protecting disrupted passengers from price increases.
 
+The hub selector covers North American, European, Asian, and Middle Eastern hubs. The dashboard requests current weather conditions from Open-Meteo when available and uses wind gusts, precipitation, and severe-weather codes as a transparent weather-severity input; simulated values remain available as a fallback.
+
 This setup is Docker-outside-of-Docker: Jenkins does not run a second Docker daemon. Instead, it manages Docker Desktop directly. The Weather Dashboard is deployed as a sibling container named `local-pipeline-app`, not as a nested container inside Jenkins. The application is exposed at `http://localhost:8081`.
 
 The Jenkins job is configured as a Pipeline job using **Pipeline script from SCM**. Jenkins reads the `Jenkinsfile` from the GitHub repository. For a public repository, no GitHub checkout credential is required. For a private repository, Jenkins uses a GitHub credential stored in Jenkins with read access to the repository.
