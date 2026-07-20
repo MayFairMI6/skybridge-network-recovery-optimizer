@@ -4,7 +4,7 @@ const path = require('path');
 
 const port = process.env.PORT || 3000;
 const build = process.env.APP_BUILD || 'local';
-const dataDir = path.join(__dirname, '..', 'data');
+const dataDir = fs.existsSync(path.join(__dirname, 'data')) ? path.join(__dirname, 'data') : path.join(__dirname, '..', 'data');
 const networkData = {
   passengers: JSON.parse(fs.readFileSync(path.join(dataDir, 'passengers.json'), 'utf8')),
   flights: JSON.parse(fs.readFileSync(path.join(dataDir, 'flights.json'), 'utf8')),
