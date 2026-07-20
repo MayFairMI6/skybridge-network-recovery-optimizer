@@ -1,14 +1,9 @@
 # Automated Deployment Pipeline — Submission Report
 
-**Student name(s):**  
-**Course / section:** `[Enter course and section]`  
-**Submission date:** `[Enter date]`  
+**Name:**   
 **GitHub repository:** https://github.com/MayFairMI6/skybridge-network-recovery-optimizer
 
-## Group members
 
-This project was completed by:  
-`[Enter your name, or list every group member here.]`
 
 ## Completed requirements
 
@@ -70,6 +65,4 @@ The following evidence was captured from my own local environment on July 20, 20
 6. I opened `http://localhost:8081` in a browser and confirmed that the SkyBridge optimizer loaded and returned a recovery recommendation.
 7. I pushed the PDF-report workflow commit to GitHub and did not use **Build Now**. Jenkins detected the change through its `H/2 * * * *` poll, queued the job as an SCM change, and automatically ran successful build #46. I confirmed the Jenkins build record reports the SCM-trigger cause.
 
-## Notes
 
-The student name field intentionally remains blank. Add your name before submitting. All screenshots above were captured from this local environment.
