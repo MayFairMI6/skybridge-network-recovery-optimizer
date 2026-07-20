@@ -3,7 +3,7 @@
 **Student name(s):**  
 **Course / section:** `[Enter course and section]`  
 **Submission date:** `[Enter date]`  
-**GitHub repository:** `[Paste the URL of your GitHub repository]`
+**GitHub repository:** https://github.com/MayFairMI6/skybridge-network-recovery-optimizer
 
 ## Group members
 
