@@ -42,23 +42,23 @@ The `Jenkinsfile` also enables SCM polling with `H/2 * * * *`, so Jenkins checks
 
 ## Verification evidence
 
-The following evidence was captured from my own local environment. Insert the real screenshots before submitting.
+The following evidence was captured from my own local environment on July 20, 2026.
 
 1. **Successful Jenkins build history**  
-   `[Insert a screenshot of the Jenkins job page here.]`  
-   The screenshot should show a successful build (blue/green success indicator). If SCM polling was tested, it should also show the new build created after the commit was pushed.
+   ![Jenkins build history](screenshots/jenkins-build-history.png)  
+   The build-history screenshot shows multiple successful Jenkins builds for the SkyBridge Pipeline job.
 
 2. **Successful Jenkins console output**  
-   `[Insert a screenshot of Console Output here.]`  
-   The screenshot shows the repository checkout, successful `docker build`, and successful `terraform apply`.
+   ![Jenkins console success](screenshots/jenkins-console-success.png)  
+   The console screenshot shows Terraform creating `local-pipeline-app:43`, the Docker port mapping `8081->3000`, and `Finished: SUCCESS`.
 
 3. **Docker runtime evidence**  
-   `[Insert a Docker Desktop or terminal screenshot here.]`  
-   The screenshot shows both `local-pipeline-jenkins` and `local-pipeline-app` running.
+   ![Docker runtime evidence](screenshots/docker-runtime.png)  
+   The terminal screenshot shows Docker Compose starting the `local-pipeline-jenkins` container and `docker ps` confirming that Jenkins is running on ports 8080 and 50000. The successful Jenkins console above independently confirms Terraform created the sibling application container on port 8081.
 
 4. **Running deployed application and automatic forecast**  
-   `[Insert a browser screenshot here.]`  
-   The screenshot shows the SkyBridge optimizer at `http://localhost:8081`, including its displayed Jenkins build number, automatic weather/airspace/ash forecast, computed metrics, and recommended recovery policy.
+   ![Running SkyBridge application](screenshots/skybridge-dashboard.png)  
+   The browser screenshot shows the deployed SkyBridge optimizer at `http://localhost:8081`, including its Jenkins build number, automatic weather/airspace/ash forecast, computed metrics, and recommended recovery policy.
 
 ## How I verified the pipeline
 
@@ -72,4 +72,4 @@ The following evidence was captured from my own local environment. Insert the re
 
 ## Notes
 
-The student name field intentionally remains blank. Add your name before submitting. Insert only screenshots captured from this local environment.
+The student name field intentionally remains blank. Add your name before submitting. All screenshots above were captured from this local environment.
