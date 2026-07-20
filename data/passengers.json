@@ -1,10 +1,10 @@
 [
-  ["Maya Chen", "SFO → JFK → LHR → DEL", "Premium · 3 legs", "Critical"],
-  ["Jon Bell", "MIA → JFK → CDG → BOM", "Economy · 3 legs", "Critical"],
-  ["Amina Yusuf", "ATL → JFK → LHR", "Business · 2 legs", "High"],
-  ["Leo Martin", "BOS → JFK → CDG → ACC", "Economy · 3 legs", "High"],
-  ["Sofia Rivera", "LAX → JFK → MAD", "Family · 2 legs", "Medium"],
-  ["Tara Singh", "YYZ → JFK → DEL", "Premium · 2 legs", "High"],
-  ["Priya Nair", "SYD → SIN → HKG → LHR", "Business · 3 legs", "Critical"],
-  ["Noah Williams", "AKL → SYD → DXB → LHR", "Economy · 3 legs", "High"]
+  ["Maya Chen", "SFO → JFK → LHR → DEL", "Premium · 3 legs", "Critical", "Platinum"],
+  ["Jon Bell", "MIA → JFK → CDG → BOM", "Economy · 3 legs", "Critical", "Gold"],
+  ["Amina Yusuf", "ATL → JFK → LHR", "Business · 2 legs", "High", "Silver"],
+  ["Leo Martin", "BOS → JFK → CDG → ACC", "Economy · 3 legs", "High", "None"],
+  ["Sofia Rivera", "LAX → JFK → MAD", "Family · 2 legs", "Medium", "Gold"],
+  ["Tara Singh", "YYZ → JFK → DEL", "Premium · 2 legs", "High", "Platinum"],
+  ["Priya Nair", "SYD → SIN → HKG → LHR", "Business · 3 legs", "Critical", "Gold"],
+  ["Noah Williams", "AKL → SYD → DXB → LHR", "Economy · 3 legs", "High", "None"]
 ]
