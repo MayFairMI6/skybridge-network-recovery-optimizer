@@ -15,4 +15,8 @@ RUN apt-get update \
     && unzip /tmp/terraform.zip -d /usr/local/bin \
     && rm -rf /var/lib/apt/lists/* /tmp/terraform.zip
 
+# The workspace can be created by the Jenkins image's original jenkins user
+# and later used by the local root-runner; allow Git to reuse that workspace.
+RUN git config --system --add safe.directory '*'
+
 USER jenkins
