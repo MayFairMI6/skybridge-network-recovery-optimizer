@@ -3,11 +3,6 @@ name: Build submission report PDF
 on:
   workflow_dispatch:
   push:
-    paths:
-      - "outputs/submission-report.md"
-      - "outputs/screenshots/**"
-      - "tools/generate_submission_pdf.py"
-      - ".github/workflows/submission-report-pdf.yml"
 
 permissions:
   contents: read
