@@ -1,7 +1,15 @@
 const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
 const port = process.env.PORT || 3000;
 const build = process.env.APP_BUILD || 'local';
+const dataDir = path.join(__dirname, '..', 'data');
+const networkData = {
+  passengers: JSON.parse(fs.readFileSync(path.join(dataDir, 'passengers.json'), 'utf8')),
+  flights: JSON.parse(fs.readFileSync(path.join(dataDir, 'flights.json'), 'utf8')),
+  network: JSON.parse(fs.readFileSync(path.join(dataDir, 'network.json'), 'utf8'))
+};
 
 http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
@@ -44,9 +52,8 @@ http.createServer((req, res) => {
   <footer>Research framing: dynamic disruption management under airport operating uncertainty. This classroom prototype uses simulated data and does not make real flight, pricing, or passenger decisions.</footer>
 </main>
 <script>
-const pax=[
- ['Maya Chen','SFO → JFK → LHR → DEL','Premium · 3 legs','Critical'],['Jon Bell','MIA → JFK → CDG → BOM','Economy · 3 legs','Critical'],['Amina Yusuf','ATL → JFK → LHR','Business · 2 legs','High'],['Leo Martin','BOS → JFK → CDG → ACC','Economy · 3 legs','High'],['Sofia Rivera','LAX → JFK → MAD','Family · 2 legs','Medium'],['Tara Singh','YYZ → JFK → DEL','Premium · 2 legs','High']
-];
+const networkData = ${JSON.stringify(networkData)};
+const pax=networkData.passengers;
 document.querySelector('#passengers').innerHTML=pax.map(p=>'<article class="passenger"><span class="priority">'+p[3]+' priority</span><b>'+p[0]+'</b><div>'+p[1]+'</div><div>'+p[2]+'</div></article>').join('');
 const hubCoords={JFK:[40.64,-73.78],ORD:[41.98,-87.90],DFW:[32.90,-97.04],LHR:[51.47,-.45],DXB:[25.25,55.36],DOH:[25.27,51.61],DEL:[28.56,77.10],SIN:[1.36,103.99],HKG:[22.31,113.91],NRT:[35.77,140.39],ICN:[37.46,126.44]};
 async function updateLiveWeather(){const code=document.querySelector('#hub').value.split(' ')[0],coord=hubCoords[code];document.querySelector('#routeHub').textContent=code+' · constrained hub';try{const url='https://api.open-meteo.com/v1/forecast?latitude='+coord[0]+'&longitude='+coord[1]+'&current=temperature_2m,wind_gusts_10m,precipitation,weather_code&wind_speed_unit=mph';const data=await fetch(url).then(r=>r.json());const c=data.current||{};const liveRisk=Math.min(1,Math.max(.35,(c.wind_gusts_10m||0)/70+(c.precipitation||0)/8+((c.weather_code||0)>=80 ? .25 : 0)+((c.weather_code||0)>=95 ? .4 : 0)));document.querySelector('#weather').value=liveRisk.toFixed(2);document.querySelector('#weatherLabel').textContent=Math.round(liveRisk*100)+'% live forecast severity';document.querySelector('#liveWeather').textContent='● Live Open-Meteo feed: '+Math.round(c.temperature_2m||0)+'° · gusts '+Math.round(c.wind_gusts_10m||0)+' mph · precipitation '+(c.precipitation||0)+' mm';run();}catch(e){document.querySelector('#liveWeather').textContent='● Live weather unavailable — using simulated severity';}}

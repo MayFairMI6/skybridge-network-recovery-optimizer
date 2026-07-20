@@ -26,6 +26,8 @@ The application uses randomized Monte Carlo trials and a non-linear, risk-adjust
 
 The hub selector covers North American, European, Asian, and Middle Eastern hubs. The dashboard requests current weather conditions from Open-Meteo when available and uses wind gusts, precipitation, and severe-weather codes as a transparent weather-severity input; simulated values remain available as a fallback.
 
+The scenario inputs are synthetic and version-controlled in `data/passengers.json`, `data/flights.json`, and `data/network.json`. These files provide multi-leg passenger itineraries, flight schedules and remaining seats, hub topology, disruption assumptions, and recovery-cost parameters. No personally identifiable passenger data is used.
+
 This setup is Docker-outside-of-Docker: Jenkins does not run a second Docker daemon. Instead, it manages Docker Desktop directly. The Weather Dashboard is deployed as a sibling container named `local-pipeline-app`, not as a nested container inside Jenkins. The application is exposed at `http://localhost:8081`.
 
 The Jenkins job is configured as a Pipeline job using **Pipeline script from SCM**. Jenkins reads the `Jenkinsfile` from the GitHub repository. For a public repository, no GitHub checkout credential is required. For a private repository, Jenkins uses a GitHub credential stored in Jenkins with read access to the repository.

@@ -14,6 +14,8 @@ The application uses a two-speed, seven-day recovery horizon: the first 72 hours
 
 The hub selector includes North American, European, Asian, and Middle Eastern hubs, including DXB, DOH, DEL, SIN, HKG, NRT, and ICN. The browser requests current conditions from the no-key [Open-Meteo forecast API](https://open-meteo.com/en/docs) and converts wind gusts, precipitation, and severe-weather codes into the forecast-severity input. If the API is unavailable, the simulator continues using its fallback severity value.
 
+Synthetic input data is committed in `data/passengers.json`, `data/flights.json`, and `data/network.json`. The app loads these records at startup, so the passenger itineraries, flight seats/statuses, hub topology, disruption assumptions, and recovery costs are inspectable and reproducible. No real passenger information is used.
+
 ## Architecture
 
 Jenkins runs in a Docker container. Its `/var/run/docker.sock` is mounted from the Docker Desktop host, so the Docker CLI and Terraform Docker provider inside Jenkins manage the **host Docker daemon**. This pattern is commonly called Docker-outside-of-Docker. The application container is therefore a sibling of Jenkins, not nested inside it.

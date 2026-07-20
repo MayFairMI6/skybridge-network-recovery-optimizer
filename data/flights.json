@@ -1,0 +1,10 @@
+[
+  {"flight":"SB101","from":"SFO","to":"JFK","depart":"14:10","arrive":"22:35","seats":8,"capacity":240,"status":"weather-risk"},
+  {"flight":"SB204","from":"MIA","to":"JFK","depart":"15:20","arrive":"18:25","seats":4,"capacity":180,"status":"weather-risk"},
+  {"flight":"SB305","from":"JFK","to":"LHR","depart":"20:05","arrive":"08:05+1","seats":6,"capacity":310,"status":"protected-long-haul"},
+  {"flight":"SB412","from":"JFK","to":"CDG","depart":"21:10","arrive":"10:25+1","seats":10,"capacity":280,"status":"protected-long-haul"},
+  {"flight":"SB518","from":"JFK","to":"DEL","depart":"22:15","arrive":"22:00+1","seats":3,"capacity":290,"status":"constrained"},
+  {"flight":"SB620","from":"ORD","to":"LHR","depart":"20:45","arrive":"10:15+1","seats":18,"capacity":260,"status":"recovery-option"},
+  {"flight":"SB701","from":"DFW","to":"LHR","depart":"21:30","arrive":"12:00+1","seats":12,"capacity":250,"status":"recovery-option"},
+  {"flight":"SB810","from":"LHR","to":"DEL","depart":"13:15","arrive":"03:10+1","seats":5,"capacity":300,"status":"connection-risk"}
+]
