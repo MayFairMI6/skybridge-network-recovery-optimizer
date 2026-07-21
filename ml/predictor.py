@@ -9,13 +9,20 @@ import json, math, os
 
 def sigmoid(x): return 1 / (1 + math.exp(-max(-30, min(30, x))))
 
+MODEL = {
+    "delay": {"intercept": -1.6, "weather": 2.5, "airspace": 2.2, "ash": 1.8, "slots": 1.5, "legs": .35},
+    "cancel": {"intercept": -3.0, "weather": 2.8, "airspace": 3.4, "ash": 2.8, "slots": 1.2},
+    "fare": {"base": 420, "demand": .32, "airspace": .18, "weather": .12},
+}
+
 def predict(x):
     weather = float(x.get("weather_risk", 0)); news = float(x.get("airspace_risk", 0))
     ash = float(x.get("ash_risk", 0)); slots = float(x.get("slot_pressure", 0))
     demand = float(x.get("last_minute_demand", .5)); legs = float(x.get("legs", 2))
-    delay = sigmoid(-1.6 + 2.5*weather + 2.2*news + 1.8*ash + 1.5*slots + .35*legs)
-    cancel = sigmoid(-3.0 + 2.8*weather + 3.4*news + 2.8*ash + 1.2*slots)
-    fare = round(420 * (1 + .32 * demand + .18 * news + .12 * weather), 2)
+    d, c, f = MODEL["delay"], MODEL["cancel"], MODEL["fare"]
+    delay = sigmoid(d["intercept"] + d["weather"]*weather + d["airspace"]*news + d["ash"]*ash + d["slots"]*slots + d["legs"]*legs)
+    cancel = sigmoid(c["intercept"] + c["weather"]*weather + c["airspace"]*news + c["ash"]*ash + c["slots"]*slots)
+    fare = round(f["base"] * (1 + f["demand"]*demand + f["airspace"]*news + f["weather"]*weather), 2)
     return {"delay_probability": round(delay, 4), "cancellation_probability": round(cancel, 4), "predicted_last_minute_fare": fare}
 
 class Handler(BaseHTTPRequestHandler):
