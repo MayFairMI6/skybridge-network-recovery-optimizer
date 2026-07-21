@@ -41,15 +41,19 @@ The following evidence was captured from my own local environment on July 20, 20
    ![Jenkins build history](screenshots/jenkins-build-history.png)  
    The build-history screenshot shows multiple successful Jenkins builds for the SkyBridge Pipeline job.
 
-2. **Successful Jenkins console output**  
+2. **Automated SCM polling trigger**  
+   ![Jenkins SCM polling trigger](screenshots/jenkins-polling-log.png)  
+   Build #51 shows the green successful status and the explicit “Started by an SCM change” cause, confirming Jenkins started it from repository polling rather than **Build Now**.
+
+3. **Successful Jenkins console output**  
    ![Jenkins console success](screenshots/jenkins-console-success.png)  
    The console screenshot shows Terraform creating `local-pipeline-app:43`, the Docker port mapping `8081->3000`, and `Finished: SUCCESS`.
 
-3. **Docker runtime evidence**  
+4. **Docker runtime evidence**  
    ![Docker runtime evidence](screenshots/docker-runtime.png)  
    The terminal screenshot shows Docker Compose starting the `local-pipeline-jenkins` container and `docker ps` confirming that Jenkins is running on ports 8080 and 50000. The successful Jenkins console above independently confirms Terraform created the sibling application container on port 8081.
 
-4. **Running deployed application and automatic forecast**  
+5. **Running deployed application and automatic forecast**  
    ![Running SkyBridge application](screenshots/skybridge-dashboard.png)  
    The browser screenshot shows the deployed SkyBridge optimizer at `http://localhost:8081`, including its Jenkins build number, automatic weather/airspace/ash forecast, computed metrics, and recommended recovery policy.
 
@@ -62,4 +66,3 @@ The following evidence was captured from my own local environment on July 20, 20
 5. I verified the deployed containers by running `docker ps --filter name=local-pipeline-app` and by checking Docker Desktop.
 6. I opened `http://localhost:8081` in a browser and confirmed that the SkyBridge optimizer loaded and returned a recovery recommendation.
 7. I pushed the PDF-report workflow commit to GitHub and did not use **Build Now**. Jenkins detected the change through its `H/2 * * * *` poll, queued the job as an SCM change, and automatically ran successful build #46. I confirmed the Jenkins build record reports the SCM-trigger cause.
-
