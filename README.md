@@ -119,7 +119,7 @@ Do not use sample or fabricated screenshots.
 
 ## Optional trained-data prediction service
 
-The `ml/` folder contains a dependency-free Python service that accepts normalized weather, airspace/news, volcanic-ash, airport-slot, demand, and itinerary-leg features. It returns delay probability, cancellation probability, and predicted last-minute fare. The included `training_schema.csv` is a classroom fixture; replace it with joined BTS/NOAA/OpenSky/VAAC extracts for model fitting. Run `python ml/predictor.py` and POST JSON to `http://localhost:8090/predict`. It is intentionally separate so the core Docker/Jenkins assignment remains runnable without paid API keys.
+The `ml/` folder contains a Python service and an optional scikit-learn training script. Install `ml/requirements-ml.txt`, join BTS/NOAA/OpenSky/VAAC extracts using the columns in `training_schema.csv`, then run `python ml/train_model.py your_joined_data.csv`. The baseline `python ml/predictor.py` remains runnable without third-party packages and accepts normalized weather, airspace/news, volcanic-ash, airport-slot, demand, and itinerary-leg features.
 
 ## Cleanup
 
