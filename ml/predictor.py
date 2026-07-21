@@ -7,7 +7,14 @@ from BTS/NOAA/OpenSky records when those datasets are available.
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json, math, os
 
-def sigmoid(x): return 1 / (1 + math.exp(-max(-30, min(30, x))))
+SIGMOID_DENOMINATOR = 1
+SIGMOID_MIN = -30
+SIGMOID_MAX = 30
+DEFAULT_RISK = 0.0
+DEFAULT_DEMAND = 0.5
+DEFAULT_LEGS = 2
+
+def sigmoid(x): return SIGMOID_DENOMINATOR / (SIGMOID_DENOMINATOR + math.exp(-max(SIGMOID_MIN, min(SIGMOID_MAX, x))))
 
 MODEL = {
     "delay": {"intercept": -1.6, "weather": 2.5, "airspace": 2.2, "ash": 1.8, "slots": 1.5, "legs": .35},
@@ -16,9 +23,9 @@ MODEL = {
 }
 
 def predict(x):
-    weather = float(x.get("weather_risk", 0)); news = float(x.get("airspace_risk", 0))
-    ash = float(x.get("ash_risk", 0)); slots = float(x.get("slot_pressure", 0))
-    demand = float(x.get("last_minute_demand", .5)); legs = float(x.get("legs", 2))
+    weather = float(x.get("weather_risk", DEFAULT_RISK)); news = float(x.get("airspace_risk", DEFAULT_RISK))
+    ash = float(x.get("ash_risk", DEFAULT_RISK)); slots = float(x.get("slot_pressure", DEFAULT_RISK))
+    demand = float(x.get("last_minute_demand", DEFAULT_DEMAND)); legs = float(x.get("legs", DEFAULT_LEGS))
     d, c, f = MODEL["delay"], MODEL["cancel"], MODEL["fare"]
     delay = sigmoid(d["intercept"] + d["weather"]*weather + d["airspace"]*news + d["ash"]*ash + d["slots"]*slots + d["legs"]*legs)
     cancel = sigmoid(c["intercept"] + c["weather"]*weather + c["airspace"]*news + c["ash"]*ash + c["slots"]*slots)
