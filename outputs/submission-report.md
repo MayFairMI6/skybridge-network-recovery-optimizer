@@ -1,9 +1,7 @@
-# Automated Deployment Pipeline —  Submission Report
+# Automated Deployment Pipeline — Submission Report
 
-**Name:**   
+**Name:**  
 **GitHub repository:** https://github.com/MayFairMI6/skybridge-network-recovery-optimizer
-
-
 
 ## Completed requirements
 
@@ -64,5 +62,4 @@ The following evidence was captured from my own local environment on July 20, 20
 5. I verified the deployed containers by running `docker ps --filter name=local-pipeline-app` and by checking Docker Desktop.
 6. I opened `http://localhost:8081` in a browser and confirmed that the SkyBridge optimizer loaded and returned a recovery recommendation.
 7. I pushed the PDF-report workflow commit to GitHub and did not use **Build Now**. Jenkins detected the change through its `H/2 * * * *` poll, queued the job as an SCM change, and automatically ran successful build #46. I confirmed the Jenkins build record reports the SCM-trigger cause.
-
 

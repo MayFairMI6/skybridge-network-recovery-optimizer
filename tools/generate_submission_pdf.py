@@ -108,9 +108,7 @@ def build_pdf():
     ]
 
     metadata = Table([
-        ["Student name(s)", ""],
-        ["Course / section", "[Enter course and section]"],
-        ["Submission date", "[Enter date]"],
+        ["Name", ""],
         ["GitHub repository", "https://github.com/MayFairMI6/skybridge-network-recovery-optimizer"],
     ], colWidths=[1.65 * inch, 4.85 * inch])
     metadata.setStyle(TableStyle([
