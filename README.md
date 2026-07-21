@@ -117,6 +117,10 @@ Capture real screenshots after your own successful run:
 
 Do not use sample or fabricated screenshots.
 
+## Optional trained-data prediction service
+
+The `ml/` folder contains a dependency-free Python service that accepts normalized weather, airspace/news, volcanic-ash, airport-slot, demand, and itinerary-leg features. It returns delay probability, cancellation probability, and predicted last-minute fare. The included `training_schema.csv` is a classroom fixture; replace it with joined BTS/NOAA/OpenSky/VAAC extracts for model fitting. Run `python ml/predictor.py` and POST JSON to `http://localhost:8090/predict`. It is intentionally separate so the core Docker/Jenkins assignment remains runnable without paid API keys.
+
 ## Cleanup
 
 To remove only the deployed app, run Terraform from a Jenkins workspace or use `docker rm -f local-pipeline-app`. To stop Jenkins while preserving its settings, run `docker compose down`. Removing the `jenkins_home` volume permanently deletes Jenkins configuration and history, so only do that intentionally.
