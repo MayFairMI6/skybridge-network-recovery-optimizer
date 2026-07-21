@@ -16,10 +16,26 @@ DEFAULT_LEGS = 2
 
 def sigmoid(x): return SIGMOID_DENOMINATOR / (SIGMOID_DENOMINATOR + math.exp(-max(SIGMOID_MIN, min(SIGMOID_MAX, x))))
 
+DELAY_INTERCEPT = -1.6
+DELAY_WEATHER_WEIGHT = 2.5
+DELAY_AIRSPACE_WEIGHT = 2.2
+DELAY_ASH_WEIGHT = 1.8
+DELAY_SLOT_WEIGHT = 1.5
+DELAY_LEG_WEIGHT = .35
+CANCEL_INTERCEPT = -3.0
+CANCEL_WEATHER_WEIGHT = 2.8
+CANCEL_AIRSPACE_WEIGHT = 3.4
+CANCEL_ASH_WEIGHT = 2.8
+CANCEL_SLOT_WEIGHT = 1.2
+BASE_FARE = 420
+FARE_DEMAND_WEIGHT = .32
+FARE_AIRSPACE_WEIGHT = .18
+FARE_WEATHER_WEIGHT = .12
+
 MODEL = {
-    "delay": {"intercept": -1.6, "weather": 2.5, "airspace": 2.2, "ash": 1.8, "slots": 1.5, "legs": .35},
-    "cancel": {"intercept": -3.0, "weather": 2.8, "airspace": 3.4, "ash": 2.8, "slots": 1.2},
-    "fare": {"base": 420, "demand": .32, "airspace": .18, "weather": .12},
+    "delay": {"intercept": DELAY_INTERCEPT, "weather": DELAY_WEATHER_WEIGHT, "airspace": DELAY_AIRSPACE_WEIGHT, "ash": DELAY_ASH_WEIGHT, "slots": DELAY_SLOT_WEIGHT, "legs": DELAY_LEG_WEIGHT},
+    "cancel": {"intercept": CANCEL_INTERCEPT, "weather": CANCEL_WEATHER_WEIGHT, "airspace": CANCEL_AIRSPACE_WEIGHT, "ash": CANCEL_ASH_WEIGHT, "slots": CANCEL_SLOT_WEIGHT},
+    "fare": {"base": BASE_FARE, "demand": FARE_DEMAND_WEIGHT, "airspace": FARE_AIRSPACE_WEIGHT, "weather": FARE_WEATHER_WEIGHT},
 }
 
 def predict(x):
