@@ -1,7 +1,7 @@
 """Small, dependency-light prediction service for the classroom prototype.
 
-It accepts normalized aviation features and returns calibrated disruption
-probabilities. Replace the heuristic coefficients with a fitted model trained
+It accepts normalized aviation features and returns heuristic disruption
+probability scores; these have not been empirically calibrated. Replace the heuristic coefficients with a fitted model trained
 from BTS/NOAA/OpenSky records when those datasets are available.
 """
 from http.server import BaseHTTPRequestHandler, HTTPServer
